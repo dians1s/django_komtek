@@ -6,10 +6,30 @@ from .models import Guide, GuideVersion, GuideElement
 from .serializers import GuideSerializer, GuideElementsSerializer
 from django.utils.dateparse import parse_date
 from datetime import date
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 # Create your views here.
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Получение справочников",
+    responses={
+        200: GuideSerializer(many=True),
+        400: "Неправильная дата",
+    },
+    manual_parameters=[
+        openapi.Parameter(
+            'date',
+            openapi.IN_QUERY,
+            description="Дата начала действия в формате ГГГГ-ММ-ДД. Если указана, то \
+                должны возвратиться только те справочники, в которых имеются \
+                Версии с Датой начала действия раннее или равной указанной.",
+            type=openapi.TYPE_STRING
+        ),
+    ]
+)
 @api_view(['GET'])
 def refbooks_list(request):
     date_str = request.GET.get('date', None)
@@ -31,6 +51,33 @@ def refbooks_list(request):
     return Response({"refbooks": serializer.data})
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Получение элементов справочника",
+    responses={
+        200: GuideElementsSerializer(many=True),
+        400: "Неправильная версия",
+    },
+    manual_parameters=[
+        openapi.Parameter(
+            'id',
+            openapi.IN_QUERY,
+            description="Идентификатор справочника",
+            type=openapi.TYPE_STRING,
+            required=True
+        ),
+        openapi.Parameter(
+            'version',
+            openapi.IN_QUERY,
+            description="Версия справочника. Если не указана, \
+            то должны возвращаются элементы текущей версии. Текущей является та версия, \
+            дата начала действия которой позже всех остальных версий данного справочника, \
+            но не позже текущей даты.",
+            type=openapi.TYPE_STRING
+        ),
+
+    ]
+)
 @api_view(['GET'])
 def guide_elements(request, id):
 
@@ -59,6 +106,56 @@ def guide_elements(request, id):
     return Response({"elements": serializer.data})
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Проверка элемента справочника",
+    responses={
+        200: openapi.Response(
+            description='Успешный ответ',
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'valid': openapi.Schema(
+                        type=openapi.TYPE_BOOLEAN,
+                        description="Имеется ли такой элемент в справочнике")},
+            )
+        ),
+        400: "Требуется код и значение справочника",
+        404: "Неверно указан код или значение справочника или такого справочника не существует",
+    },
+    manual_parameters=[
+        openapi.Parameter(
+            'id',
+            openapi.IN_QUERY,
+            description="Идентификатор справочника",
+            type=openapi.TYPE_STRING,
+            required=True
+        ),
+        openapi.Parameter(
+            'code',
+            openapi.IN_QUERY,
+            description="Код элемента справочника",
+            type=openapi.TYPE_STRING,
+            required=True
+        ),
+        openapi.Parameter(
+            'value',
+            openapi.IN_QUERY,
+            description="Значение элемента справочника",
+            type=openapi.TYPE_STRING,
+            required=True
+        ),
+        openapi.Parameter(
+            'version',
+            openapi.IN_QUERY,
+            description="Версия справочника.\
+            Если не указана, то должны проверяться элементы в текущей версии.\
+            Текущей является та версия, дата начала действия которой позже всех остальных\
+            версий данного справочника, но не позже текущей даты.",
+            type=openapi.TYPE_STRING
+        ),
+    ]
+)
 @api_view(['GET'])
 def check_element(request, id):
 
