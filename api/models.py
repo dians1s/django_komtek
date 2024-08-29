@@ -7,6 +7,10 @@ class Guide(models.Model):
     name = models.CharField(max_length=300)
     description = models.TextField(blank=True)
 
+    class Meta:
+        verbose_name = 'Справочник'
+        verbose_name_plural = 'Справочники'
+
     def __str__(self):
         return str(self.id)
 
@@ -18,6 +22,8 @@ class GuideVersion(models.Model):
     dateStart = models.DateField(blank=True)
 
     class Meta:
+        verbose_name = 'Версия справочника'
+        verbose_name_plural = 'Версии справочников'
         constraints = [
             models.UniqueConstraint(
                 fields=['idGuide', 'version'], name='unique_idGuide_version'),
@@ -36,6 +42,8 @@ class GuideElement(models.Model):
     elementValue = models.CharField(max_length=300)
 
     class Meta:
+        verbose_name = 'Элемент справочника'
+        verbose_name_plural = 'Элементы справочников'
         constraints = [
             models.UniqueConstraint(
                 fields=['idVersion', 'elementCode'], name='unique_idVersion_elementCode')

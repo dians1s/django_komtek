@@ -81,8 +81,23 @@ class GuideVersionAdmin(admin.ModelAdmin):
 
 
 class GuideElementAdmin(admin.ModelAdmin):
-    list_display = ('id', 'idVersion', 'elementCode', 'elementValue')
+    list_display = ('getIdVersion', 'getElementCode', 'getElementValue')
     fields = ('idVersion', 'elementCode', 'elementValue')
+
+    def getIdVersion(self, obj):
+        return str(obj.idVersion)
+
+    getIdVersion.short_description = 'Идентификатор версии'
+
+    def getElementCode(self, obj):
+        return obj.elementCode
+
+    getElementCode.short_description = 'Код элемента'
+
+    def getElementValue(self, obj):
+        return obj.elementValue
+
+    getElementValue.short_description = 'Значение элемента'
 
 
 admin.site.register(Guide, GuideAdmin)
