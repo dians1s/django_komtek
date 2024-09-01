@@ -61,7 +61,7 @@ def refbooks_list(request):
     manual_parameters=[
         openapi.Parameter(
             'id',
-            openapi.IN_QUERY,
+            openapi.IN_PATH,
             description="Идентификатор справочника",
             type=openapi.TYPE_STRING,
             required=True
@@ -84,21 +84,24 @@ def guide_elements(request, id):
     version = request.GET.get('version', None)
 
     try:
-        idGuide = Guide.objects.get(id=id)
+        codeGuide = Guide.objects.get(id=id).code
     except:
         return Response({"error": "Guide not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if version:
         try:
             idVersion = GuideVersion.objects.get(
-                idGuide=idGuide, version=version)
+                codeGuide=codeGuide, version=version)
         except:
             return Response({"error": "Guide version not found"}, status=status.HTTP_404_NOT_FOUND)
     else:
-        idVersion = GuideVersion.objects.filter(
-            idGuide=idGuide, dateStart__lte=date.today()).latest('dateStart')
-        if not idVersion:
-            return Response({"error": "No current version found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            idVersion = GuideVersion.objects.filter(
+                codeGuide=codeGuide, dateStart__lte=date.today()).latest('dateStart')
+            if not idVersion:
+                return Response({"error": "No current version found"}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({"error": "Elements Not Found"}, status=status.HTTP_404_NOT_FOUND)
 
     elements = GuideElement.objects.filter(idVersion=idVersion)
     serializer = GuideElementsSerializer(elements, many=True)
@@ -126,7 +129,7 @@ def guide_elements(request, id):
     manual_parameters=[
         openapi.Parameter(
             'id',
-            openapi.IN_QUERY,
+            openapi.IN_PATH,
             description="Идентификатор справочника",
             type=openapi.TYPE_STRING,
             required=True
@@ -167,21 +170,24 @@ def check_element(request, id):
         return Response({"error": "Required code and value params"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        idGuide = Guide.objects.get(id=id)
+        codeGuide = Guide.objects.get(id=id).code
     except:
         return Response({"error": "Guide not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if version:
         try:
             idVersion = GuideVersion.objects.get(
-                idGuide=idGuide, version=version)
+                codeGuide=codeGuide, version=version)
         except:
             return Response({"error": "Version not found"}, status=status.HTTP_404_NOT_FOUND)
     else:
-        idVersion = GuideVersion.objects.filter(
-            idGuide=idGuide, dateStart__lte=date.today()).latest('dateStart')
-        if not idVersion:
-            return Response({"error": "Version not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            idVersion = GuideVersion.objects.filter(
+                codeGuide=codeGuide, dateStart__lte=date.today()).latest('dateStart')
+            if not idVersion:
+                return Response({"error": "Version not found"}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({"error": "Versions Not Found"}, status=status.HTTP_404_NOT_FOUND)
 
     res = GuideElement.objects.filter(
         idVersion=idVersion, elementCode=code, elementValue=value).exists()

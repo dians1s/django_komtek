@@ -35,7 +35,7 @@ class GuideModelWithDateTest(APITestCase):
             description='Testdescription2.'
         )
         self.guide_version = GuideVersion.objects.create(
-            idGuide=self.guide,
+            codeGuide=self.guide,
             version="20",
             dateStart=parse_date("2024-08-08")
         )
@@ -69,7 +69,7 @@ class GuideElementsTest(APITestCase):
             description='Testdescription2.'
         )
         self.guide_version = GuideVersion.objects.create(
-            idGuide=self.guide,
+            codeGuide=self.guide,
             version="20",
             dateStart=parse_date("2024-08-08")
         )
@@ -115,7 +115,7 @@ class GuideCheckElementTests(APITestCase):
     def setUp(self):
         self.guide = Guide.objects.create(code="T1", name="Test Guide")
         self.guide_version = GuideVersion.objects.create(
-            idGuide=self.guide,
+            codeGuide=self.guide,
             version="1.0",
             dateStart=parse_date("2024-01-01")
         )

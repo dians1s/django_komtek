@@ -1,10 +1,11 @@
 from django.contrib import admin
 from .models import Guide, GuideVersion, GuideElement
+from .forms import GuideVersionForm, GuideElementForm
 
 
 class GuideVersionInline(admin.TabularInline):
     model = GuideVersion
-    fields = ('idGuide', 'version', 'dateStart')
+    fields = ('codeGuide', 'version', 'dateStart')
 
 
 class GuideElementInline(admin.TabularInline):
@@ -36,7 +37,7 @@ class GuideAdmin(admin.ModelAdmin):
     def currentVersion(self, obj):
         try:
             latest_version = GuideVersion.objects.filter(
-                idGuide=obj).latest('dateStart')
+                codeGuide=obj).latest('dateStart')
             return latest_version.version
         except:
             return 'Нет версий'
@@ -46,7 +47,7 @@ class GuideAdmin(admin.ModelAdmin):
     def currentDateStart(self, obj):
         try:
             latest_date = GuideVersion.objects.filter(
-                idGuide=obj).latest('dateStart')
+                codeGuide=obj).latest('dateStart')
             return latest_date.dateStart
         except:
             return 'Нет даты'
@@ -55,17 +56,19 @@ class GuideAdmin(admin.ModelAdmin):
 
 
 class GuideVersionAdmin(admin.ModelAdmin):
-    list_display = ('getIdGuide', 'getNameGuide', 'getVersion', 'getDateStart')
+    form = GuideVersionForm
+    list_display = ('getcodeGuide', 'getNameGuide',
+                    'getVersion', 'getDateStart')
     inlines = [GuideElementInline]
-    fields = ('idGuide', 'version', 'dateStart')
+    fields = ('codeGuide', 'version', 'dateStart')
 
-    def getIdGuide(self, obj):
-        return str(obj.idGuide)
+    def getcodeGuide(self, obj):
+        return str(obj.codeGuide.code)
 
-    getIdGuide.short_description = 'Код справочника'
+    getcodeGuide.short_description = 'Код справочника'
 
     def getNameGuide(self, obj):
-        return Guide.objects.get(id=obj.idGuide.id).name
+        return Guide.objects.get(code=obj.codeGuide.code).name
 
     getNameGuide.short_description = 'Наименование справочника'
 
@@ -81,6 +84,7 @@ class GuideVersionAdmin(admin.ModelAdmin):
 
 
 class GuideElementAdmin(admin.ModelAdmin):
+    form = GuideElementForm
     list_display = ('getIdVersion', 'getElementCode', 'getElementValue')
     fields = ('idVersion', 'elementCode', 'elementValue')
 
