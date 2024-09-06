@@ -84,7 +84,7 @@ def guide_elements(request, id):
     version = request.GET.get('version', None)
 
     try:
-        codeGuide = Guide.objects.get(id=id).code
+        codeGuide = Guide.objects.get(id=id)
     except:
         return Response({"error": "Guide not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -170,7 +170,7 @@ def check_element(request, id):
         return Response({"error": "Required code and value params"}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        codeGuide = Guide.objects.get(id=id).code
+        codeGuide = Guide.objects.get(id=id)
     except:
         return Response({"error": "Guide not found"}, status=status.HTTP_404_NOT_FOUND)
 

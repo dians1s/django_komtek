@@ -20,7 +20,7 @@ class Guide(models.Model):
 
 class GuideVersion(models.Model):
     id = models.AutoField(primary_key=True)
-    codeGuide = models.ForeignKey(Guide, to_field='code', on_delete=models.CASCADE,
+    codeGuide = models.ForeignKey(Guide, on_delete=models.CASCADE,
                                   verbose_name=('Код справочника и его наименование'))
     version = models.CharField(verbose_name=(
         'Версия справочника'), max_length=50)
